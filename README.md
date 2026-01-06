@@ -174,9 +174,3 @@ Setelah impact:
 
 ---
 
-## 11. Lisensi
-
-Bebas digunakan untuk pembelajaran dan pengembangan proyek sejenis.
-
-```
-```
