@@ -1,3 +1,4 @@
+````md
 # Smart Wristband Seudati  
 **MPU6050 + LCD I2C + Motor Haptic (Mode Coach & Mode Latih)**
 
@@ -90,3 +91,92 @@ Mode dapat **di-toggle dengan tombol**.
 1. Baca akselerasi MPU6050:
    ```cpp
    mpu.getAcceleration(&ax, &ay, &az);
+````
+
+2. Hitung **magnitude** (kekuatan gerak total):
+   [
+   Mag = \sqrt{ax^2 + ay^2 + az^2}
+   ]
+3. Hitung **perubahan getaran (jerk)**:
+   [
+   Jerk = |Mag_{sekarang} - Mag_{sebelumnya}|
+   ]
+4. Impact terdeteksi jika:
+
+   * `jerk > impactThreshold`
+   * dan **cooldown** 1 detik terpenuhi
+
+### 6.2 Penilaian
+
+Setelah impact:
+
+* **Timing benar** jika:
+
+  ```cpp
+  abs(currentTime - nextBeatTime) <= tolerance
+  ```
+* **Gerak tangan benar** jika:
+
+  ```cpp
+  abs(ax) > armThreshold || abs(ay) > armThreshold || abs(az) > armThreshold
+  ```
+
+**SEMPURNA** = timing benar **dan** gerak benar
+**SALAH** = salah satu tidak terpenuhi
+
+---
+
+## 7. Cara Kerja Mode Coach
+
+* Motor bergetar mengikuti **BPM** dan **pattern** per level.
+* Beat diatur oleh `g_beatIntervalMs`.
+* Jenis getaran:
+
+  * `HAPTIC_PULSE` (pendek)
+  * `HAPTIC_LONG` (panjang)
+  * `HAPTIC_DOUBLE` (dua kali)
+* LCD:
+
+  * Baris 1: `Mode Coach`
+  * Baris 2: status (Level / Haptic), dengan “hold” agar terbaca jelas.
+* Setelah Level 3 selesai → **Coach Stopped**.
+
+---
+
+## 8. Cara Pakai (Quick Start)
+
+1. Rangkai hardware sesuai wiring.
+2. Upload sketch ke Arduino.
+3. Awal menyala di **Mode Latih** (`Ready`).
+4. Tekan tombol → masuk **Mode Coach** (motor mulai bergetar).
+5. Tekan tombol lagi → kembali ke **Mode Latih**.
+
+---
+
+## 9. Troubleshooting
+
+* **LCD tidak tampil / aneh**: cek alamat (`0x27`/`0x3F`), SDA/SCL, power.
+* **MPU6050 tidak terbaca**: cek alamat `0x68`, koneksi I2C.
+* **Sering SALAH**:
+
+  * Sesuaikan `impactThreshold` / `armThreshold`
+  * Cek `tolerance`
+  * Kurangi noise (getaran non-tepukan)
+
+---
+
+## 10. Pengembangan Lanjutan (Opsional)
+
+* Tambah filter (low-pass) akselerasi
+* Gunakan orientasi/gyro untuk validasi posisi tangan
+* Gunakan **metronome absolut** (jadwal tetap) untuk penilaian timing
+* Sinkronkan `targetInterval` dengan BPM musik
+
+---
+
+## 11. Lisensi
+
+Bebas digunakan untuk pembelajaran dan pengembangan proyek sejenis.
+
+```
+```
